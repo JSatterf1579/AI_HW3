@@ -33,6 +33,8 @@ public interface StripsAction {
      *
      * In the process of updating the peasant state you should also update the GameState's cost and parent pointers.
      *
+     *
+     * General thoughts: Create new state using deep copy constructor, apply actions to new state, add action to list
      * @param state State to apply action to
      * @return State resulting from successful action appliction.
      */

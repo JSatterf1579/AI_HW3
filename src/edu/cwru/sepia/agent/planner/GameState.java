@@ -95,6 +95,16 @@ public class GameState implements Comparable<GameState> {
     }
 
     /**
+     * Creates a deep copy of the GameState for use in applying actions
+     * @param oldState
+     */
+    public GameState(GameState oldState) {
+        //Deep copy the state
+
+
+    }
+
+    /**
      * Unlike in the first A* assignment there are many possible goal states. As long as the wood and gold requirements
      * are met the peasants can be at any location and the capacities of the resource locations can be anything. Use
      * this function to check if the goal conditions are met and return true if they are.

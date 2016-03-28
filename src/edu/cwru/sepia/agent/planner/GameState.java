@@ -1,7 +1,10 @@
 package edu.cwru.sepia.agent.planner;
 
+import edu.cwru.sepia.agent.planner.actions.StripsAction;
 import edu.cwru.sepia.environment.model.state.State;
+import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,6 +26,27 @@ import java.util.List;
  */
 public class GameState implements Comparable<GameState> {
 
+    public int xExtent;
+    public int yExtent;
+
+    public int playernum;
+
+    public int requiredGold;
+    public int requiredWood;
+
+    public int currentGold;
+    public int currentWood;
+
+    public List<UnitInfo> units;
+    public List<UnitInfo> townHalls;
+
+    public List<StripsAction> actions;
+
+    public List<ResourceInfo> mines;
+    public List<ResourceInfo> trees;
+
+    public boolean canBuildPeasants;
+
     /**
      * Construct a GameState from a stateview object. This is used to construct the initial search node. All other
      * nodes should be constructed from the another constructor you create or by factory functions that you create.
@@ -35,6 +59,25 @@ public class GameState implements Comparable<GameState> {
      */
     public GameState(State.StateView state, int playernum, int requiredGold, int requiredWood, boolean buildPeasants) {
         // TODO: Implement me!
+        xExtent = state.getXExtent();
+        yExtent = state.getYExtent();
+        this.requiredGold = requiredGold;
+        this.requiredWood = requiredWood;
+        canBuildPeasants = buildPeasants;
+        this.playernum = playernum;
+
+        units = new ArrayList<>();
+        List<Integer> unitIds = state.getUnitIds(playernum);
+        for(Integer id : unitIds) {
+            UnitView unit = state.getUnit(id);
+            if(unit.getTemplateView().getName().equals("Peasant")) {
+                units.add(new UnitInfo(unit));
+            } else if (unit.getTemplateView().getName().equals("TownHall")) {
+                townHalls.add(new UnitInfo(unit));
+            }
+        }
+
+        actions = new ArrayList<>();
     }
 
     /**
@@ -45,8 +88,11 @@ public class GameState implements Comparable<GameState> {
      * @return true if the goal conditions are met in this instance of game state.
      */
     public boolean isGoal() {
-        // TODO: Implement me!
-        return false;
+        if(currentGold == requiredGold && currentWood == requiredWood) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

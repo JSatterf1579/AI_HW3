@@ -25,4 +25,17 @@ public class ResourceInfo {
         capacity = info.capacity;
     }
 
+    public boolean equals(Object o) {
+        if(this == o) {
+            return true;
+        }
+
+        if(o instanceof ResourceInfo) {
+            ResourceInfo other = (ResourceInfo) o;
+            return this.type == other.type && this.position.equals(other.position) && this.capacity == other.capacity;
+        } else {
+            return false;
+        }
+    }
+
 }

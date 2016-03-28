@@ -34,6 +34,19 @@ public class UnitInfo {
         amount = unit.amount;
     }
 
+    public boolean equals(Object o) {
+        if(this == o) {
+            return true;
+        }
+
+        if(o instanceof UnitInfo) {
+            UnitInfo other = (UnitInfo)o;
+            return other.location.equals(this.location) && other.cargo == this.cargo && other.amount == this.amount;
+        } else {
+            return false;
+        }
+    }
+
 
     public enum UnitType {
         PEASANT, TOWNHALL

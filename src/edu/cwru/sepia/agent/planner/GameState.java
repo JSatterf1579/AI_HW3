@@ -1,6 +1,7 @@
 package edu.cwru.sepia.agent.planner;
 
 import edu.cwru.sepia.agent.planner.actions.StripsAction;
+import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 
@@ -67,6 +68,7 @@ public class GameState implements Comparable<GameState> {
         this.playernum = playernum;
 
         units = new ArrayList<>();
+        townHalls = new ArrayList<>();
         List<Integer> unitIds = state.getUnitIds(playernum);
         for(Integer id : unitIds) {
             UnitView unit = state.getUnit(id);
@@ -76,6 +78,18 @@ public class GameState implements Comparable<GameState> {
                 townHalls.add(new UnitInfo(unit));
             }
         }
+
+        mines = new ArrayList<>();
+        for(ResourceNode.ResourceView view : state.getResourceNodes(ResourceNode.Type.GOLD_MINE)) {
+            mines.add(new ResourceInfo(view));
+        }
+
+        trees = new ArrayList<>();
+        for(ResourceNode.ResourceView view : state.getResourceNodes(ResourceNode.Type.TREE)) {
+            trees.add(new ResourceInfo(view));
+        }
+
+
 
         actions = new ArrayList<>();
     }

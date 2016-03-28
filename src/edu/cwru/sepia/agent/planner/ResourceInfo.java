@@ -1,7 +1,6 @@
 package edu.cwru.sepia.agent.planner;
 
 import edu.cwru.sepia.environment.model.state.ResourceNode;
-import edu.cwru.sepia.environment.model.state.ResourceType;
 
 /**
  * Created by Joseph on 3/28/2016.
@@ -23,6 +22,10 @@ public class ResourceInfo {
         type = info.type;
         position = new Position(info.position);
         capacity = info.capacity;
+    }
+
+    public boolean hasResources() {
+        return capacity > 0;
     }
 
     public boolean equals(Object o) {

@@ -6,7 +6,9 @@ import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is used to represent the state of the game after applying one of the avaiable actions. It will also
@@ -38,13 +40,13 @@ public class GameState implements Comparable<GameState> {
     public int currentGold;
     public int currentWood;
 
-    public List<UnitInfo> units;
-    public List<UnitInfo> townHalls;
+    public Map<Integer, UnitInfo> units;
+    public Map<Integer, UnitInfo> townHalls;
 
     public List<StripsAction> actions;
 
-    public List<ResourceInfo> mines;
-    public List<ResourceInfo> trees;
+    public Map<Integer, ResourceInfo> mines;
+    public Map<Integer, ResourceInfo> trees;
 
     public boolean canBuildPeasants;
 
@@ -67,26 +69,26 @@ public class GameState implements Comparable<GameState> {
         canBuildPeasants = buildPeasants;
         this.playernum = playernum;
 
-        units = new ArrayList<>();
-        townHalls = new ArrayList<>();
+        units = new HashMap<>();
+        townHalls = new HashMap<>();
         List<Integer> unitIds = state.getUnitIds(playernum);
         for(Integer id : unitIds) {
             UnitView unit = state.getUnit(id);
             if(unit.getTemplateView().getName().equals("Peasant")) {
-                units.add(new UnitInfo(unit));
+                units.put(unit.getID(), new UnitInfo(unit));
             } else if (unit.getTemplateView().getName().equals("TownHall")) {
-                townHalls.add(new UnitInfo(unit));
+                townHalls.put(unit.getID(), new UnitInfo(unit));
             }
         }
 
-        mines = new ArrayList<>();
+        mines = new HashMap<>();
         for(ResourceNode.ResourceView view : state.getResourceNodes(ResourceNode.Type.GOLD_MINE)) {
-            mines.add(new ResourceInfo(view));
+            mines.put(view.getID(), new ResourceInfo(view));
         }
 
-        trees = new ArrayList<>();
+        trees = new HashMap<>();
         for(ResourceNode.ResourceView view : state.getResourceNodes(ResourceNode.Type.TREE)) {
-            trees.add(new ResourceInfo(view));
+            trees.put(view.getID(), new ResourceInfo(view));
         }
 
 
@@ -100,8 +102,33 @@ public class GameState implements Comparable<GameState> {
      */
     public GameState(GameState oldState) {
         //Deep copy the state
+        xExtent = oldState.xExtent;
+        yExtent = oldState.yExtent;
+        requiredWood = oldState.requiredWood;
+        requiredGold = oldState.requiredGold;
+        canBuildPeasants = oldState.canBuildPeasants;
+        playernum = oldState.playernum;
 
+        units = new HashMap<>();
 
+        for(Integer i : oldState.units.keySet()) {
+            units.put(i, new UnitInfo(oldState.units.get(i)));
+        }
+
+        townHalls = new HashMap<>();
+        for(Integer i : oldState.townHalls.keySet()) {
+            townHalls.put(i, new UnitInfo(oldState.townHalls.get(i)));
+        }
+
+        mines = new HashMap<>();
+        for(Integer i : oldState.mines.keySet()) {
+            mines.put(i, new ResourceInfo(oldState.mines.get(i)));
+        }
+
+        trees = new HashMap<>();
+        for(Integer i: oldState.trees.keySet()) {
+            trees.put(i, new ResourceInfo(oldState.trees.get(i)));
+        }
     }
 
     /**

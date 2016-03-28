@@ -7,18 +7,21 @@ import edu.cwru.sepia.environment.model.state.ResourceNode;
  */
 public class ResourceInfo {
 
+    public int resourceID;
     public ResourceNode.Type type;
     public Position position;
     public int capacity;
 
 
     public ResourceInfo(ResourceNode.ResourceView view) {
+        resourceID = view.getID();
         type = view.getType();
         position = new Position(view.getXPosition(), view.getYPosition());
         capacity = view.getAmountRemaining();
     }
 
     public ResourceInfo(ResourceInfo info) {
+        resourceID = info.resourceID;
         type = info.type;
         position = new Position(info.position);
         capacity = info.capacity;

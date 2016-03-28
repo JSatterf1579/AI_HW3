@@ -8,6 +8,8 @@ import edu.cwru.sepia.environment.model.state.Unit.UnitView;
  */
 public class UnitInfo {
 
+    public int unitID;
+
     public UnitType type;
 
     public Position location;
@@ -22,12 +24,15 @@ public class UnitInfo {
             type = UnitType.TOWNHALL;
         }
 
+        unitID = unit.getID();
+
         location = new Position(unit.getXPosition(), unit.getYPosition());
         cargo = unit.getCargoType();
         amount = unit.getCargoAmount();
     }
 
     public UnitInfo(UnitInfo unit) {
+        unitID = unit.unitID;
         type = unit.type;
         location = new Position(unit.location);
         cargo = unit.cargo;

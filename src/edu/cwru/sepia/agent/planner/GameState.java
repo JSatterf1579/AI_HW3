@@ -2,6 +2,7 @@ package edu.cwru.sepia.agent.planner;
 
 import edu.cwru.sepia.agent.planner.actions.StripsAction;
 import edu.cwru.sepia.environment.model.state.ResourceNode;
+import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 
@@ -129,6 +130,11 @@ public class GameState implements Comparable<GameState> {
         for(Integer i: oldState.trees.keySet()) {
             trees.put(i, new ResourceInfo(oldState.trees.get(i)));
         }
+
+        actions = new ArrayList<>();
+        for(int i = 0; i < oldState.actions.size(); i++){
+            actions.add(oldState.actions.get(i));
+        }
     }
 
     /**
@@ -139,7 +145,7 @@ public class GameState implements Comparable<GameState> {
      * @return true if the goal conditions are met in this instance of game state.
      */
     public boolean isGoal() {
-        if(currentGold == requiredGold && currentWood == requiredWood) {
+        if(currentGold >= requiredGold && currentWood >= requiredWood) {
             return true;
         } else {
             return false;
@@ -167,7 +173,92 @@ public class GameState implements Comparable<GameState> {
      */
     public double heuristic() {
         // TODO: Implement me!
-        return 0.0;
+        double heuristic = 0.0;
+
+        //find largest distance between TH and Gold and TH and trees
+        double largestTHGoldDistance = Double.MIN_VALUE;
+        double largestTHWoodDistance = Double.MIN_VALUE;
+        for(UnitInfo unit : townHalls.values()) {
+            for(ResourceInfo mine : mines.values()) {
+                double distance = unit.location.chebyshevDistance(mine.position);
+                if(distance > largestTHGoldDistance) {
+                    largestTHGoldDistance = distance;
+                }
+            }
+
+            for(ResourceInfo tree: trees.values()) {
+                double distance = unit.location.chebyshevDistance(tree.position);
+                if(distance > largestTHWoodDistance) {
+                    largestTHWoodDistance = distance;
+                }
+            }
+        }
+
+        //Lose value for amount of turns needed fulfil goal for gold
+        heuristic -= 2 * largestTHGoldDistance *((Math.max(requiredGold - currentGold, 0) / 100) / units.size()) * 10;
+
+        //Same for wood
+        heuristic -= 2 * largestTHWoodDistance * ((Math.max(requiredWood - currentWood, 0) / 100) / units.size()) * 10;
+
+        //Add value back for each unit carrying gold or wood, since they are half way done with the deposit
+        int goldCarriers = 0;
+        int woodCarriers = 0;
+        for(UnitInfo unit : units.values()) {
+            if(unit.cargo == ResourceType.GOLD) {
+                goldCarriers++;
+            } else if (unit.cargo == ResourceType.WOOD) {
+                woodCarriers++;
+            }
+        }
+
+        heuristic += largestTHGoldDistance * goldCarriers * 10;
+        heuristic += largestTHWoodDistance * woodCarriers * 10;
+
+        //Prefer units being closer to the TH, if possible
+        for(UnitInfo unit : units.values()) {
+            double maxDistance = Double.MIN_VALUE;
+            for(UnitInfo th : townHalls.values()) {
+                if(th.location.chebyshevDistance(unit.location) > maxDistance) {
+                    maxDistance = th.location.chebyshevDistance(unit.location);
+                }
+            }
+            heuristic -= maxDistance;
+        }
+
+        //Bonuses for doing proper actions (turning in when you can, getting needed resources) and detriments for
+        //doing un-needed tasks (collecting excess resources)
+        for(UnitInfo unit : units.values()) {
+            //Is gold still necessary?
+            if(unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_GOLD || unit.currentAction == UnitInfo.HeuristicAction.PICKING_UP_GOLD) {
+                if (currentGold < requiredGold) {
+                    heuristic += 100;
+                } else {
+                    heuristic -= 100;
+                }
+            }
+
+            //Same for wood
+            if(unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_WOOD || unit.currentAction == UnitInfo.HeuristicAction.PICKING_UP_WOOD) {
+                if (currentWood < requiredWood) {
+                    heuristic += 100;
+                } else {
+                    heuristic -= 100;
+                }
+            }
+
+            //Are you returning if you're carrying something, or still in the turn where you picked it up
+            if(unit.cargo != null) {
+                if (unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_HALL) {
+                    heuristic += 100;
+                } else if(unit.currentAction == UnitInfo.HeuristicAction.PICKING_UP_GOLD || unit.currentAction == UnitInfo.HeuristicAction.PICKING_UP_WOOD) {
+                    //Change nothing on the heuristic
+                } else {
+                    heuristic -= 100;
+                }
+            }
+        }
+
+        return heuristic;
     }
 
     /**
@@ -178,8 +269,12 @@ public class GameState implements Comparable<GameState> {
      * @return The current cost to reach this goal
      */
     public double getCost() {
-        // TODO: Implement me!
-        return 0.0;
+        // TODO: Finish implementation
+        double cost = 0.0;
+        for(StripsAction action : actions) {
+
+        }
+        return cost;
     }
 
     /**

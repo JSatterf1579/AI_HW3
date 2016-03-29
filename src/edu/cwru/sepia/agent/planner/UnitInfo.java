@@ -16,6 +16,7 @@ public class UnitInfo {
 
     public ResourceType cargo;
     public int amount;
+    public HeuristicAction currentAction;
 
     public UnitInfo(UnitView unit) {
         if(unit.getTemplateView().getName().equals("Peasant")) {
@@ -29,6 +30,8 @@ public class UnitInfo {
         location = new Position(unit.getXPosition(), unit.getYPosition());
         cargo = unit.getCargoType();
         amount = unit.getCargoAmount();
+        currentAction = HeuristicAction.IDLE;
+
     }
 
     public UnitInfo(UnitInfo unit) {
@@ -37,6 +40,7 @@ public class UnitInfo {
         location = new Position(unit.location);
         cargo = unit.cargo;
         amount = unit.amount;
+        currentAction = unit.currentAction;
     }
 
     public boolean hasResources() {
@@ -60,5 +64,10 @@ public class UnitInfo {
     public enum UnitType {
         PEASANT, TOWNHALL
     }
+
+    public enum HeuristicAction {
+        MOVING_TO_HALL, MOVING_TO_GOLD, MOVING_TO_WOOD, PICKING_UP_WOOD, PICKING_UP_GOLD, DEPOSITING_GOLD, DEPOSITING_WOOD, IDLE
+    }
+
 }
 

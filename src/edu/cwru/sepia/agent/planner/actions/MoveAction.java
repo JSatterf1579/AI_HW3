@@ -61,4 +61,8 @@ public abstract class MoveAction implements StripsAction{
         }
         return true;
     }
+
+    public double getCost() {
+        return this.cost;
+    }
 }

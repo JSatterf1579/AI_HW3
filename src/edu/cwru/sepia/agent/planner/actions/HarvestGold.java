@@ -13,7 +13,6 @@ public class HarvestGold extends HarvestAction{
 
     public UnitInfo peasant = null;
     public ResourceInfo resource = null;
-    public double cost = 1;
 
     public HarvestGold(UnitInfo unit, ResourceInfo resource) {
         this.peasant = unit;

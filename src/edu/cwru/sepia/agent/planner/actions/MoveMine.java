@@ -10,9 +10,13 @@ import edu.cwru.sepia.environment.model.state.ResourceNode;
  * Created by Steven on 3/28/2016.
  */
 public class MoveMine extends MoveAction {
+
+    public ResourceInfo resource = null;
+
     public MoveMine(UnitInfo peasant, ResourceInfo resource) {
         this.peasant = peasant;
         this.resource = resource;
+        this.targetPosition = resource.position;
         this.cost = peasant.location.chebyshevDistance(resource.position);
     }
 

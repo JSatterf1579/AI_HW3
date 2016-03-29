@@ -13,14 +13,14 @@ import java.util.Map;
  */
 public abstract class MoveAction implements StripsAction{
     public UnitInfo peasant = null;
-    public ResourceInfo resource = null;
+    public Position targetPosition = null;
     public double cost = 0;
 
     @Override
     public GameState apply(GameState state) {
         GameState newState = new GameState(state);
         UnitInfo newUnit = state.units.get(peasant.unitID);
-        newUnit.location = getClosestAdjacentToTarget(state);
+        newUnit.location = new Position(targetPosition);
         newState.actions.add(this);
         return newState;
     }
@@ -28,7 +28,7 @@ public abstract class MoveAction implements StripsAction{
     public Position getClosestAdjacentToTarget(GameState state) {
         double closestDistance = Integer.MAX_VALUE;
         Position closestPos = null;
-        List<Position> possibleLocs = resource.position.getAdjacentPositions();
+        List<Position> possibleLocs = targetPosition.getAdjacentPositions();
         for (Position position: possibleLocs) {
             double dist = position.euclideanDistance(peasant.location);
             if (closestPos == null && position.inBounds(state.xExtent, state.yExtent) && notOccupied(position, state)) {

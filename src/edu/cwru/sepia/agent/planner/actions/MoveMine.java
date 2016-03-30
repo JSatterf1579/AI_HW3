@@ -28,4 +28,17 @@ public class MoveMine extends MoveAction {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("MoveMine(");
+        sb.append(peasant.unitID);
+        sb.append(", ");
+        sb.append(resource.position.x);
+        sb.append(", ");
+        sb.append(resource.position.y);
+        sb.append(")");
+        return sb.toString();
+    }
 }

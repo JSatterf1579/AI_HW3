@@ -122,7 +122,7 @@ public class PEAgent extends Agent {
             Direction dirToHall = hAction.resource.position.getDirection(new Position(actualUnit.getXPosition(), actualUnit.getYPosition()));
             retMap.put(actualID, Action.createPrimitiveGather(actualID, dirToHall));
         }
-        System.out.println(action.toString());
+        //System.out.println(action.toString());
         return retMap;
     }
 

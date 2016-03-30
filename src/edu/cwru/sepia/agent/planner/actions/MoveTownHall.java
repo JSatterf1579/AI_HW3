@@ -26,4 +26,17 @@ public class MoveTownHall extends MoveAction {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("MoveTownHall(");
+        sb.append(peasant.unitID);
+        sb.append(", ");
+        sb.append(townHall.location.x);
+        sb.append(", ");
+        sb.append(townHall.location.y);
+        sb.append(")");
+        return sb.toString();
+    }
 }

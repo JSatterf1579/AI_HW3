@@ -31,4 +31,17 @@ public class DepositGold extends DepositAction {
         newState.actions.add(this);
         return newState;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("DepositGold(");
+        sb.append(peasant.unitID);
+        sb.append(", ");
+        sb.append(townHall.location.x);
+        sb.append(", ");
+        sb.append(townHall.location.y);
+        sb.append(")");
+        return sb.toString();
+    }
 }

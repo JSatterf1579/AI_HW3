@@ -34,4 +34,17 @@ public class HarvestGold extends HarvestAction{
         newState.actions.add(this);
         return newState;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("HarvestGold(");
+        sb.append(peasant.unitID);
+        sb.append(", ");
+        sb.append(resource.position.x);
+        sb.append(", ");
+        sb.append(resource.position.y);
+        sb.append(")");
+        return sb.toString();
+    }
 }

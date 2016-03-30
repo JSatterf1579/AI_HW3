@@ -11,10 +11,6 @@ import edu.cwru.sepia.environment.model.state.ResourceType;
  */
 public class HarvestWood extends HarvestAction{
 
-    public UnitInfo peasant = null;
-    public ResourceInfo resource = null;
-    public double cost = 1;
-
     public HarvestWood(UnitInfo unit, ResourceInfo resource) {
         this.peasant = unit;
         this.resource = resource;

@@ -62,7 +62,13 @@ public abstract class MoveAction implements StripsAction{
         return true;
     }
 
+    @Override
     public double getCost() {
         return this.cost;
+    }
+
+    @Override
+    public int getUnitID() {
+        return peasant.unitID;
     }
 }

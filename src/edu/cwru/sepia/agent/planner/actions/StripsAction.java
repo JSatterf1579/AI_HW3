@@ -10,6 +10,8 @@ import edu.cwru.sepia.agent.planner.GameState;
 public interface StripsAction {
 
     public double getCost();
+    public int getUnitID();
+    public String toString();  //TODO implement for all leaf classes
 
     /**
      * Returns true if the provided GameState meets all of the necessary conditions for this action to successfully

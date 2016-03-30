@@ -11,9 +11,6 @@ import edu.cwru.sepia.environment.model.state.ResourceType;
  */
 public class HarvestGold extends HarvestAction{
 
-    public UnitInfo peasant = null;
-    public ResourceInfo resource = null;
-
     public HarvestGold(UnitInfo unit, ResourceInfo resource) {
         this.peasant = unit;
         this.resource = resource;

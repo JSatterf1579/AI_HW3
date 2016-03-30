@@ -8,12 +8,14 @@ import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Template;
 import edu.cwru.sepia.environment.model.state.Unit;
+import edu.cwru.sepia.util.Direction;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This is an outline of the PEAgent. Implement the provided methods. You may add your own methods and members.
@@ -92,8 +94,36 @@ public class PEAgent extends Agent {
      */
     @Override
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
-        // TODO: Implement me!
-        return null;
+        // TODO: Implement me! (waiting)
+        StripsAction action = plan.pop();
+        Map<Integer, Action> retMap = new HashMap<>();
+        int stripsID = action.getUnitID();
+        int actualID = peasantIdMap.get(stripsID);
+        Unit.UnitView actualUnit = stateView.getUnit(actualID);
+
+        // wait for previous action to be done for this unit
+        while (actualUnit.getCurrentDurativeAction() != null) {
+            try{
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {}
+        }
+
+        if (action instanceof  MoveAction) {
+            MoveAction mAction = (MoveAction)action;
+            retMap.put(actualID, Action.createCompoundMove(actualID, mAction.targetPosition.x, mAction.targetPosition.y));
+        }
+        if (action instanceof DepositAction) {
+            DepositAction dAction = (DepositAction)action;
+            Direction dirToHall = dAction.townHall.location.getDirection(new Position(actualUnit.getXPosition(), actualUnit.getYPosition()));
+            retMap.put(actualID, Action.createPrimitiveDeposit(actualID, dirToHall));
+        }
+        if (action instanceof  HarvestAction) {
+            HarvestAction hAction = (HarvestAction)action;
+            Direction dirToHall = hAction.resource.position.getDirection(new Position(actualUnit.getXPosition(), actualUnit.getYPosition()));
+            retMap.put(actualID, Action.createPrimitiveGather(actualID, dirToHall));
+        }
+        System.out.println(action.toString());
+        return retMap;
     }
 
     /**

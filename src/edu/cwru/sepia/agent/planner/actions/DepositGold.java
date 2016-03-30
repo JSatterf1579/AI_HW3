@@ -8,8 +8,6 @@ import edu.cwru.sepia.environment.model.state.ResourceType;
  * Created by Steven on 3/28/2016.
  */
 public class DepositGold extends DepositAction {
-    public UnitInfo peasant = null;
-    public UnitInfo townHall = null;
 
     public DepositGold(UnitInfo unit, UnitInfo townHall) {
         this.peasant = unit;

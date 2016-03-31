@@ -69,5 +69,29 @@ public class UnitInfo {
         MOVING_TO_HALL, MOVING_TO_GOLD, MOVING_TO_WOOD, PICKING_UP_WOOD, PICKING_UP_GOLD, DEPOSITING_GOLD, DEPOSITING_WOOD, IDLE
     }
 
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Un");
+        sb.append(unitID);
+        sb.append(location.toString());
+        if (type == UnitType.PEASANT) {
+            sb.append("P");
+            if (cargo == null) {
+                sb.append("E");
+            } else if (cargo == ResourceType.WOOD) {
+                sb.append("W");
+            } else {
+                sb.append("G");
+            }
+        } else {
+            sb.append("T");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.toString().hashCode();
+    }
 }
 

@@ -290,27 +290,30 @@ public class GameState implements Comparable<GameState> {
         return 0;
     }
 
-    /**
-     * This will be necessary to use the GameState as a key in a Set or Map.
-     *
-     * @param o The game state to compare
-     * @return True if this state equals the other state, false otherwise.
-     */
     @Override
     public boolean equals(Object o) {
-        // TODO: Implement me!
-        return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GameState gameState = (GameState) o;
+
+        if (currentGold != gameState.currentGold) return false;
+        if (currentWood != gameState.currentWood) return false;
+        if (!units.equals(gameState.units)) return false;
+        if (!townHalls.equals(gameState.townHalls)) return false;
+        if (!mines.equals(gameState.mines)) return false;
+        return trees.equals(gameState.trees);
+
     }
 
-    /**
-     * This is necessary to use the GameState as a key in a HashSet or HashMap. Remember that if two objects are
-     * equal they should hash to the same value.
-     *
-     * @return An integer hashcode that is equal for equal states.
-     */
     @Override
     public int hashCode() {
-        // TODO: Implement me!
-        return 0;
+        int result = currentGold;
+        result = 31 * result + currentWood;
+        result = 31 * result + units.hashCode();
+        result = 31 * result + townHalls.hashCode();
+        result = 31 * result + mines.hashCode();
+        result = 31 * result + trees.hashCode();
+        return result;
     }
 }

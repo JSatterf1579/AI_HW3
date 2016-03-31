@@ -44,4 +44,23 @@ public class ResourceInfo {
         }
     }
 
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Res");
+        sb.append(resourceID);
+        sb.append(position.toString());
+        if (type == ResourceNode.Type.GOLD_MINE) {
+            sb.append("G");
+        } else {
+            sb.append("W");
+        }
+        sb.append(capacity);
+        return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.toString().hashCode();
+    }
+
 }

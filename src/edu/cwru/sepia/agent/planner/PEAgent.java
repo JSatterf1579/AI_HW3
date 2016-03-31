@@ -96,12 +96,9 @@ public class PEAgent extends Agent {
      */
     @Override
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
-        // TODO: Implement me! (waiting)
+        // TODO: Implement me! (multiple actions/peasant build)
         StripsAction action = plan.pop();
         Map<Integer, Action> retMap = new HashMap<>();
-        int stripsID = action.getUnitID();
-        int actualID = peasantIdMap.get(stripsID);
-        Unit.UnitView actualUnit = stateView.getUnit(actualID);
 
         //System.out.println(action.toString());
 
@@ -110,16 +107,52 @@ public class PEAgent extends Agent {
 //            plan.push(action);
 //            return retMap;
 //        }
+
+
+        if (action instanceof CombinationAction) {
+            CombinationAction cAction = (CombinationAction)action;
+            for (StripsAction subAction: cAction.actions) {
+                if (!isUnitBusy(subAction.getUnitID(), stateView, historyView)) {
+                    addSepiaAction(subAction, stateView, retMap);
+                } else {
+                    plan.push(subAction);
+                    return retMap;
+                }
+            }
+        } else {
+            if (!isUnitBusy(action.getUnitID(), stateView, historyView)) {
+                addSepiaAction(action, stateView, retMap);
+            } else {
+                plan.push(action);
+                return retMap;
+            }
+        }
+
+
+        return retMap;
+    }
+
+    public boolean isUnitBusy(int unitID, State.StateView stateView, History.HistoryView historyView) {
         if (stateView.getTurnNumber() != 0) {
             Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
             for (ActionResult result : actionResults.values()) {
                 if (result.getFeedback() == ActionFeedback.INCOMPLETE) {
-                    plan.push(action);
-                    return retMap;
+                    return true;
                 }
-                System.out.println(result.toString());
             }
         }
+        return false;
+    }
+
+    /**
+     * Returns a SEPIA version of the specified Strips Action.
+     * @param action StripsAction
+     * @return SEPIA representation of same action
+     */
+    private void addSepiaAction(StripsAction action, State.StateView stateView, Map<Integer, Action> retMap) {
+        int stripsID = action.getUnitID();
+        int actualID = peasantIdMap.get(stripsID);
+        Unit.UnitView actualUnit = stateView.getUnit(actualID);
 
         if (action instanceof  MoveAction) {
             MoveAction mAction = (MoveAction)action;
@@ -135,16 +168,6 @@ public class PEAgent extends Agent {
             Direction dirToHall = new Position(actualUnit.getXPosition(), actualUnit.getYPosition()).getDirection(hAction.resource.position);
             retMap.put(actualID, Action.createPrimitiveGather(actualID, dirToHall));
         }
-        return retMap;
-    }
-
-    /**
-     * Returns a SEPIA version of the specified Strips Action.
-     * @param action StripsAction
-     * @return SEPIA representation of same action
-     */
-    private Action createSepiaAction(StripsAction action) {
-        return null;
     }
 
     @Override

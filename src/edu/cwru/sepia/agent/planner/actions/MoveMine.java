@@ -24,7 +24,7 @@ public class MoveMine extends MoveAction {
     public boolean preconditionsMet(GameState state) {
         if (peasant.type == UnitInfo.UnitType.PEASANT && resource.type == ResourceNode.Type.GOLD_MINE) {
             Position pos = this.getClosestAdjacentToTarget(state);
-            return null == pos;
+            return null != pos;
         }
         return false;
     }

@@ -22,7 +22,7 @@ public class MoveTownHall extends MoveAction {
     public boolean preconditionsMet(GameState state) {
         if (peasant.type == UnitInfo.UnitType.PEASANT && townHall.type == UnitInfo.UnitType.TOWNHALL) {
             Position pos = this.getClosestAdjacentToTarget(state);
-            return null == pos;
+            return null != pos;
         }
         return false;
     }

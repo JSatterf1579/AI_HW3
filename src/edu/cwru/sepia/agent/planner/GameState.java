@@ -1,11 +1,12 @@
 package edu.cwru.sepia.agent.planner;
 
-import edu.cwru.sepia.agent.planner.actions.StripsAction;
+import edu.cwru.sepia.agent.planner.actions.*;
 import edu.cwru.sepia.environment.model.state.ResourceNode;
 import edu.cwru.sepia.environment.model.state.ResourceType;
 import edu.cwru.sepia.environment.model.state.State;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 
+import javax.print.DocFlavor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +63,7 @@ public class GameState implements Comparable<GameState> {
      * @param buildPeasants True if the BuildPeasant action should be considered
      */
     public GameState(State.StateView state, int playernum, int requiredGold, int requiredWood, boolean buildPeasants) {
-        // TODO: Implement me!
+
         xExtent = state.getXExtent();
         yExtent = state.getYExtent();
         this.requiredGold = requiredGold;
@@ -159,8 +160,63 @@ public class GameState implements Comparable<GameState> {
      * @return A list of the possible successor states and their associated actions
      */
     public List<GameState> generateChildren() {
-        // TODO: Implement me!
-        return null;
+
+        List<GameState> children = new ArrayList<>();
+
+        for(UnitInfo unit: units.values()) {
+            //Generate all move to gold pairs
+            for(ResourceInfo gold: mines.values()) {
+                StripsAction move = new MoveMine(unit, gold);
+                if(move.preconditionsMet(this)) {
+                    children.add(move.apply(this));
+                }
+
+                //Generate all gold pickups
+                StripsAction harvest = new HarvestGold(unit, gold);
+                if(harvest.preconditionsMet(this)) {
+                    children.add(harvest.apply(this));
+                }
+
+            }
+
+            //Generate all move to wood pairs
+            for(ResourceInfo wood: trees.values()) {
+                StripsAction move = new MoveForest(unit, wood);
+                if(move.preconditionsMet(this)) {
+                    children.add(move.apply(this));
+                }
+
+                //Generate all wood pickups
+                StripsAction harvest = new HarvestWood(unit, wood);
+                if(harvest.preconditionsMet(this)) {
+                    children.add(harvest.apply(this));
+                }
+            }
+
+            //Generate all move to town hall pairs
+            for(UnitInfo hall: townHalls.values()) {
+                StripsAction move = new MoveTownHall(unit, hall);
+                if(move.preconditionsMet(this)) {
+                    children.add(move.apply(this));
+                }
+
+                //generate all gold dropoffs
+                StripsAction dropGold = new DepositGold(unit, hall);
+                if(dropGold.preconditionsMet(this)) {
+                    children.add(dropGold.apply(this));
+                }
+
+                //generate all wood dropoffs
+                StripsAction dropWood = new DepositWood(unit, hall);
+                if(dropWood.preconditionsMet(this)) {
+                    children.add(dropWood.apply(this));
+                }
+
+            }
+        }
+
+
+        return children;
     }
 
     /**
@@ -172,7 +228,7 @@ public class GameState implements Comparable<GameState> {
      * @return The value estimated remaining cost to reach a goal state from this state.
      */
     public double heuristic() {
-        // TODO: Implement me!
+
         double heuristic = 0.0;
 
         //find largest distance between TH and Gold and TH and trees
@@ -195,10 +251,10 @@ public class GameState implements Comparable<GameState> {
         }
 
         //Lose value for amount of turns needed fulfil goal for gold
-        heuristic -= 2 * largestTHGoldDistance *((Math.max(requiredGold - currentGold, 0) / 100) / units.size()) * 10;
+        heuristic += 2 * largestTHGoldDistance *((Math.max(requiredGold - currentGold, 0) / 100) / units.size()) * 10;
 
         //Same for wood
-        heuristic -= 2 * largestTHWoodDistance * ((Math.max(requiredWood - currentWood, 0) / 100) / units.size()) * 10;
+        heuristic += 2 * largestTHWoodDistance * ((Math.max(requiredWood - currentWood, 0) / 100) / units.size()) * 10;
 
         //Add value back for each unit carrying gold or wood, since they are half way done with the deposit
         int goldCarriers = 0;
@@ -211,8 +267,8 @@ public class GameState implements Comparable<GameState> {
             }
         }
 
-        heuristic += largestTHGoldDistance * goldCarriers * 10;
-        heuristic += largestTHWoodDistance * woodCarriers * 10;
+        heuristic -= largestTHGoldDistance * goldCarriers * 10;
+        heuristic -= largestTHWoodDistance * woodCarriers * 10;
 
         //Prefer units being closer to the TH, if possible
         for(UnitInfo unit : units.values()) {
@@ -222,7 +278,7 @@ public class GameState implements Comparable<GameState> {
                     maxDistance = th.location.chebyshevDistance(unit.location);
                 }
             }
-            heuristic -= maxDistance;
+            heuristic += maxDistance;
         }
 
         //Bonuses for doing proper actions (turning in when you can, getting needed resources) and detriments for
@@ -231,29 +287,30 @@ public class GameState implements Comparable<GameState> {
             //Is gold still necessary?
             if(unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_GOLD || unit.currentAction == UnitInfo.HeuristicAction.PICKING_UP_GOLD) {
                 if (currentGold < requiredGold) {
-                    heuristic += 100;
+                    heuristic -= 1;
                 } else {
-                    heuristic -= 100;
+                    //heuristic += 1;
                 }
             }
 
             //Same for wood
             if(unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_WOOD || unit.currentAction == UnitInfo.HeuristicAction.PICKING_UP_WOOD) {
                 if (currentWood < requiredWood) {
-                    heuristic += 100;
+                    heuristic -= 1;
                 } else {
-                    heuristic -= 100;
+                    //heuristic += 1;
                 }
             }
 
             //Are you returning if you're carrying something, or still in the turn where you picked it up
             if(unit.cargo != null) {
-                if (unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_HALL) {
-                    heuristic += 100;
+                if (unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_HALL || unit.currentAction == UnitInfo.HeuristicAction.DEPOSITING_GOLD ||
+                        unit.currentAction == UnitInfo.HeuristicAction.DEPOSITING_WOOD) {
+                    heuristic -= 2;
                 } else if(unit.currentAction == UnitInfo.HeuristicAction.PICKING_UP_GOLD || unit.currentAction == UnitInfo.HeuristicAction.PICKING_UP_WOOD) {
                     //Change nothing on the heuristic
                 } else {
-                    heuristic -= 100;
+                    heuristic += 1;
                 }
             }
         }
@@ -269,10 +326,10 @@ public class GameState implements Comparable<GameState> {
      * @return The current cost to reach this goal
      */
     public double getCost() {
-        // TODO: Finish implementation
+
         double cost = 0.0;
         for(StripsAction action : actions) {
-
+            cost += action.getCost();
         }
         return cost;
     }
@@ -286,8 +343,8 @@ public class GameState implements Comparable<GameState> {
      */
     @Override
     public int compareTo(GameState o) {
-        // TODO: Implement me!
-        return 0;
+
+        return Double.compare(this.heuristic() + this.getCost(), o.heuristic() + o.getCost());
     }
 
     @Override

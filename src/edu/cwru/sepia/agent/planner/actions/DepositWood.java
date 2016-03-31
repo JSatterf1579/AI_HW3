@@ -27,6 +27,7 @@ public class DepositWood extends DepositAction{
         UnitInfo newUnit = newState.units.get(peasant.unitID);
         newUnit.cargo = null;
         newUnit.amount = 0;
+        newUnit.currentAction = UnitInfo.HeuristicAction.DEPOSITING_WOOD;
         newState.currentWood += 100;
         newState.actions.add(this);
         return newState;

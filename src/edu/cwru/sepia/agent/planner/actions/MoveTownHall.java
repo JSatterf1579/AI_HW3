@@ -39,4 +39,12 @@ public class MoveTownHall extends MoveAction {
         sb.append(")");
         return sb.toString();
     }
+
+    @Override
+    public GameState apply(GameState state) {
+        GameState newState = super.apply(state);
+        UnitInfo newUnit = newState.units.get(peasant.unitID);
+        newUnit.currentAction = UnitInfo.HeuristicAction.MOVING_TO_HALL;
+        return newState;
+    }
 }

@@ -29,6 +29,7 @@ public class HarvestWood extends HarvestAction{
         UnitInfo newUnit = newState.units.get(peasant.unitID);
         newUnit.cargo = ResourceType.WOOD;
         newUnit.amount = 100;
+        newUnit.currentAction = UnitInfo.HeuristicAction.PICKING_UP_WOOD;
         ResourceInfo newResource = newState.mines.get(resource.resourceID);
         newResource.capacity -= 100;
         newState.actions.add(this);

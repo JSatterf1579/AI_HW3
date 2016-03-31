@@ -27,6 +27,7 @@ public class DepositGold extends DepositAction {
         UnitInfo newUnit = newState.units.get(peasant.unitID);
         newUnit.cargo = null;
         newUnit.amount = 0;
+        newUnit.currentAction = UnitInfo.HeuristicAction.DEPOSITING_GOLD;
         newState.currentGold += 100;
         newState.actions.add(this);
         return newState;

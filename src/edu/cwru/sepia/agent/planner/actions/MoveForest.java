@@ -21,6 +21,14 @@ public class MoveForest extends MoveAction{
     }
 
     @Override
+    public GameState apply(GameState state) {
+        GameState newState = super.apply(state);
+        UnitInfo newUnit = newState.units.get(peasant.unitID);
+        newUnit.currentAction = UnitInfo.HeuristicAction.MOVING_TO_WOOD;
+        return newState;
+    }
+
+    @Override
     public boolean preconditionsMet(GameState state) {
         if (peasant.type == UnitInfo.UnitType.PEASANT && resource.type == ResourceNode.Type.TREE) {
             Position pos = this.getClosestAdjacentToTarget(state);

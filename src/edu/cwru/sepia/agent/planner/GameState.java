@@ -287,7 +287,7 @@ public class GameState implements Comparable<GameState> {
             //Is gold still necessary?
             if(unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_GOLD || unit.currentAction == UnitInfo.HeuristicAction.PICKING_UP_GOLD) {
                 if (currentGold < requiredGold) {
-                    heuristic -= 1;
+                    heuristic -= 1 - largestTHGoldDistance;
                 } else {
                     //heuristic += 1;
                 }
@@ -296,7 +296,7 @@ public class GameState implements Comparable<GameState> {
             //Same for wood
             if(unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_WOOD || unit.currentAction == UnitInfo.HeuristicAction.PICKING_UP_WOOD) {
                 if (currentWood < requiredWood) {
-                    heuristic -= 1;
+                    heuristic -= 1 - largestTHWoodDistance;
                 } else {
                     //heuristic += 1;
                 }

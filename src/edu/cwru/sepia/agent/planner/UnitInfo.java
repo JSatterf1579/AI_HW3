@@ -32,6 +32,7 @@ public class UnitInfo {
         amount = unit.getCargoAmount();
         currentAction = HeuristicAction.IDLE;
 
+
     }
 
     public UnitInfo(UnitInfo unit) {

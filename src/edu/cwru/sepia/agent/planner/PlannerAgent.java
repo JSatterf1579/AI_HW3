@@ -97,7 +97,7 @@ public class PlannerAgent extends Agent {
         int gen = 0;
         int tossed = 0;
         GameState current = null;
-        PriorityQueue<GameState> nextStates = new PriorityQueue<>();
+        PriorityQueue<GameState> nextStates = new PriorityQueue<>(Collections.reverseOrder());
         Set<GameState> closedStates = new HashSet<>();
 
         nextStates.add(startState);

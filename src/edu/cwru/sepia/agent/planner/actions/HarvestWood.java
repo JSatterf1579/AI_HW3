@@ -26,10 +26,10 @@ public class HarvestWood extends HarvestAction{
     @Override
     public GameState apply(GameState state) {
         GameState newState = new GameState(state);
-        UnitInfo newUnit = state.units.get(peasant.unitID);
+        UnitInfo newUnit = newState.units.get(peasant.unitID);
         newUnit.cargo = ResourceType.WOOD;
         newUnit.amount = 100;
-        ResourceInfo newResource = state.mines.get(resource.resourceID);
+        ResourceInfo newResource = newState.mines.get(resource.resourceID);
         newResource.capacity -= 100;
         newState.actions.add(this);
         return newState;

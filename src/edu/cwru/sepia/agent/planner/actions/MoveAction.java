@@ -19,7 +19,7 @@ public abstract class MoveAction implements StripsAction{
     @Override
     public GameState apply(GameState state) {
         GameState newState = new GameState(state);
-        UnitInfo newUnit = state.units.get(peasant.unitID);
+        UnitInfo newUnit = newState.units.get(peasant.unitID);
         newUnit.location = new Position(targetPosition);
         newState.actions.add(this);
         return newState;

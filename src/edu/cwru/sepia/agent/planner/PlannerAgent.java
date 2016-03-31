@@ -92,6 +92,35 @@ public class PlannerAgent extends Agent {
      */
     private Stack<StripsAction> AstarSearch(GameState startState) {
         // TODO: Implement me!
+
+        GameState current = null;
+        PriorityQueue<GameState> nextStates = new PriorityQueue<>();
+        Set<GameState> closedStates = new HashSet<>();
+
+        nextStates.add(startState);
+
+        while(nextStates.peek() != null) {
+            current = nextStates.poll();
+            if(current.isGoal()) {
+                //Return the stack of actions
+                Stack<StripsAction> actions = new Stack<>();
+                for(int i = current.actions.size() - 1; i >= 0; i--) {
+                    actions.push(current.actions.get(i));
+                }
+            }
+
+            //otherwise expand children, etc
+            List<GameState> kids = current.generateChildren();
+            for(GameState kid: kids) {
+                if(closedStates.contains(kid)) {
+                    continue;
+                }
+                if(!nextStates.contains(kid)) {
+                    nextStates.add(kid);
+                }
+            }
+        }
+
         return null;
     }
 

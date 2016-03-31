@@ -287,25 +287,27 @@ public class GameState implements Comparable<GameState> {
         //doing un-needed tasks (collecting excess resources)
         for(UnitInfo unit : units.values()) {
             //Is gold still necessary?
-            if(unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_GOLD || unit.currentAction == UnitInfo.HeuristicAction.PICKING_UP_GOLD) {
+            if(unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_GOLD) {
                 if (currentGold < requiredGold) {
-                    heuristic -= 1 + smallestTHGoldDistance;
+                    heuristic -= smallestTHGoldDistance;
                 } else {
                     //heuristic += 1;
                 }
             }
 
+            
+
             //Same for wood
-            if(unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_WOOD || unit.currentAction == UnitInfo.HeuristicAction.PICKING_UP_WOOD) {
+            if(unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_WOOD) {
                 if (currentWood < requiredWood) {
-                    heuristic -= 1 + smallestTHWoodDistance;
+                    heuristic -= smallestTHWoodDistance;
                 } else {
                     //heuristic += 1;
                 }
             }
 
             //Are you returning if you're carrying something, or still in the turn where you picked it up
-            if(unit.cargo != null) {
+            /*if(unit.cargo != null) {
                 if (unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_HALL || unit.currentAction == UnitInfo.HeuristicAction.DEPOSITING_GOLD ||
                         unit.currentAction == UnitInfo.HeuristicAction.DEPOSITING_WOOD) {
                     heuristic -= 2;
@@ -314,7 +316,7 @@ public class GameState implements Comparable<GameState> {
                 } else {
                     heuristic += 1;
                 }
-            }
+            }*/
         }
 
         return heuristic;

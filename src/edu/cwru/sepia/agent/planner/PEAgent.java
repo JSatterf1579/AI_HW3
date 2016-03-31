@@ -102,10 +102,9 @@ public class PEAgent extends Agent {
         Unit.UnitView actualUnit = stateView.getUnit(actualID);
 
         // wait for previous action to be done for this unit
-        while (actualUnit.getCurrentDurativeAction() != null) {
-            try{
-                TimeUnit.MILLISECONDS.sleep(100);
-            } catch (InterruptedException e) {}
+        if (actualUnit.getCurrentDurativeAction() != null) {
+            plan.push(action);
+            return retMap;
         }
 
         if (action instanceof  MoveAction) {

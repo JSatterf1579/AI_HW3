@@ -30,7 +30,7 @@ public class DepositWood extends DepositAction{
         newUnit.currentAction = UnitInfo.HeuristicAction.DEPOSITING_WOOD;
         newState.currentWood += 100;
         newState.actions.add(this);
-        System.out.println("(" + newState.currentGold + "g," + newState.currentWood + "w)" );
+        //System.out.println("(" + newState.currentGold + "g," + newState.currentWood + "w)" );
         return newState;
     }
 

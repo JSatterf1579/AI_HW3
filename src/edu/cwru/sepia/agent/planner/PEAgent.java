@@ -101,6 +101,8 @@ public class PEAgent extends Agent {
         int actualID = peasantIdMap.get(stripsID);
         Unit.UnitView actualUnit = stateView.getUnit(actualID);
 
+        //System.out.println(action.toString());
+
         // wait for previous action to be done for this unit
         if (actualUnit.getCurrentDurativeAction() != null) {
             plan.push(action);
@@ -121,7 +123,6 @@ public class PEAgent extends Agent {
             Direction dirToHall = hAction.resource.position.getDirection(new Position(actualUnit.getXPosition(), actualUnit.getYPosition()));
             retMap.put(actualID, Action.createPrimitiveGather(actualID, dirToHall));
         }
-        //System.out.println(action.toString());
         return retMap;
     }
 

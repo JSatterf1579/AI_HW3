@@ -24,7 +24,7 @@ public class DepositGold extends DepositAction {
     @Override
     public GameState apply(GameState state) {
         GameState newState = new GameState(state);
-        UnitInfo newUnit = state.units.get(peasant.unitID);
+        UnitInfo newUnit = newState.units.get(peasant.unitID);
         newUnit.cargo = null;
         newUnit.amount = 0;
         newState.currentGold += 100;

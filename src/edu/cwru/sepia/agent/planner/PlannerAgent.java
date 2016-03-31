@@ -40,7 +40,7 @@ public class PlannerAgent extends Agent {
     public Map<Integer, Action> initialStep(State.StateView stateView, History.HistoryView historyView) {
 
         Stack<StripsAction> plan = AstarSearch(new GameState(stateView, playernum, requiredGold, requiredWood, buildPeasants));
-
+        System.out.println("Plan's done");
         if(plan == null) {
             System.err.println("No plan was found");
             System.exit(1);
@@ -93,6 +93,9 @@ public class PlannerAgent extends Agent {
     private Stack<StripsAction> AstarSearch(GameState startState) {
         // TODO: Implement me!
 
+        int iter = 0;
+        int gen = 0;
+        int tossed = 0;
         GameState current = null;
         PriorityQueue<GameState> nextStates = new PriorityQueue<>();
         Set<GameState> closedStates = new HashSet<>();
@@ -100,9 +103,11 @@ public class PlannerAgent extends Agent {
         nextStates.add(startState);
 
         while(nextStates.peek() != null) {
+            iter++;
             current = nextStates.poll();
             closedStates.add(current);
             if(current.isGoal()) {
+                System.out.println("" + iter + "," + gen + "," + tossed);
                 //Return the stack of actions
                 Stack<StripsAction> actions = new Stack<>();
                 for(int i = current.actions.size() - 1; i >= 0; i--) {
@@ -114,7 +119,9 @@ public class PlannerAgent extends Agent {
             //otherwise expand children, etc
             List<GameState> kids = current.generateChildren();
             for(GameState kid: kids) {
+                gen++;
                 if(closedStates.contains(kid)) {
+                    tossed++;
                     continue;
                 }
                 if(!nextStates.contains(kid)) {

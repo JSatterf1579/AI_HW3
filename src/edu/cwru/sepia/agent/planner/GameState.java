@@ -110,6 +110,8 @@ public class GameState implements Comparable<GameState> {
         requiredGold = oldState.requiredGold;
         canBuildPeasants = oldState.canBuildPeasants;
         playernum = oldState.playernum;
+        currentGold = oldState.currentGold;
+        currentWood = oldState.currentWood;
 
         units = new HashMap<>();
 
@@ -348,7 +350,7 @@ public class GameState implements Comparable<GameState> {
     @Override
     public int compareTo(GameState o) {
 
-        return Double.compare(this.heuristic() + this.getCost(), o.heuristic() + o.getCost());
+        return Double.compare(0 + this.getCost(), 0 + o.getCost());
     }
 
     @Override

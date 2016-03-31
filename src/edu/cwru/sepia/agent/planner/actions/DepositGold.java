@@ -30,6 +30,7 @@ public class DepositGold extends DepositAction {
         newUnit.currentAction = UnitInfo.HeuristicAction.DEPOSITING_GOLD;
         newState.currentGold += 100;
         newState.actions.add(this);
+        System.out.println("(" + newState.currentGold + "g," + newState.currentWood + "w)" );
         return newState;
     }
 

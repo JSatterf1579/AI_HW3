@@ -101,6 +101,7 @@ public class PlannerAgent extends Agent {
 
         while(nextStates.peek() != null) {
             current = nextStates.poll();
+            closedStates.add(current);
             if(current.isGoal()) {
                 //Return the stack of actions
                 Stack<StripsAction> actions = new Stack<>();

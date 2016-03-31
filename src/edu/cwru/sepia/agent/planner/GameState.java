@@ -232,29 +232,29 @@ public class GameState implements Comparable<GameState> {
         double heuristic = 0.0;
 
         //find largest distance between TH and Gold and TH and trees
-        double largestTHGoldDistance = Double.MIN_VALUE;
-        double largestTHWoodDistance = Double.MIN_VALUE;
+        double smallestTHGoldDistance = Double.MAX_VALUE;
+        double smallestTHWoodDistance = Double.MAX_VALUE;
         for(UnitInfo unit : townHalls.values()) {
             for(ResourceInfo mine : mines.values()) {
                 double distance = unit.location.chebyshevDistance(mine.position);
-                if(distance > largestTHGoldDistance) {
-                    largestTHGoldDistance = distance;
+                if(distance < smallestTHGoldDistance) {
+                    smallestTHGoldDistance = distance;
                 }
             }
 
             for(ResourceInfo tree: trees.values()) {
                 double distance = unit.location.chebyshevDistance(tree.position);
-                if(distance > largestTHWoodDistance) {
-                    largestTHWoodDistance = distance;
+                if(distance < smallestTHWoodDistance) {
+                    smallestTHWoodDistance = distance;
                 }
             }
         }
 
         //Lose value for amount of turns needed fulfil goal for gold
-        heuristic += 2 * largestTHGoldDistance *((Math.max(requiredGold - currentGold, 0) / 100) / units.size()) * 10;
+        heuristic += 2 * smallestTHGoldDistance *((Math.max(requiredGold - currentGold, 0) / 100) / units.size()) + 2;
 
         //Same for wood
-        heuristic += 2 * largestTHWoodDistance * ((Math.max(requiredWood - currentWood, 0) / 100) / units.size()) * 10;
+        heuristic += 2 * smallestTHWoodDistance * ((Math.max(requiredWood - currentWood, 0) / 100) / units.size()) + 2;
 
         //Add value back for each unit carrying gold or wood, since they are half way done with the deposit
         int goldCarriers = 0;
@@ -267,8 +267,8 @@ public class GameState implements Comparable<GameState> {
             }
         }
 
-        heuristic -= largestTHGoldDistance * goldCarriers * 10;
-        heuristic -= largestTHWoodDistance * woodCarriers * 10;
+        heuristic -= (smallestTHGoldDistance + 1) * goldCarriers ;
+        heuristic -= (smallestTHWoodDistance + 1) * woodCarriers ;
 
         //Prefer units being closer to the TH, if possible
         for(UnitInfo unit : units.values()) {
@@ -278,7 +278,9 @@ public class GameState implements Comparable<GameState> {
                     maxDistance = th.location.chebyshevDistance(unit.location);
                 }
             }
-            heuristic += maxDistance;
+            if(unit.cargo != null) {
+                heuristic += maxDistance;
+            }
         }
 
         //Bonuses for doing proper actions (turning in when you can, getting needed resources) and detriments for
@@ -287,7 +289,7 @@ public class GameState implements Comparable<GameState> {
             //Is gold still necessary?
             if(unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_GOLD || unit.currentAction == UnitInfo.HeuristicAction.PICKING_UP_GOLD) {
                 if (currentGold < requiredGold) {
-                    heuristic -= 1 - largestTHGoldDistance;
+                    heuristic -= 1 + smallestTHGoldDistance;
                 } else {
                     //heuristic += 1;
                 }
@@ -296,7 +298,7 @@ public class GameState implements Comparable<GameState> {
             //Same for wood
             if(unit.currentAction == UnitInfo.HeuristicAction.MOVING_TO_WOOD || unit.currentAction == UnitInfo.HeuristicAction.PICKING_UP_WOOD) {
                 if (currentWood < requiredWood) {
-                    heuristic -= 1 - largestTHWoodDistance;
+                    heuristic -= 1 + smallestTHWoodDistance;
                 } else {
                     //heuristic += 1;
                 }

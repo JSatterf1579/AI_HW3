@@ -107,6 +107,7 @@ public class PlannerAgent extends Agent {
                 for(int i = current.actions.size() - 1; i >= 0; i--) {
                     actions.push(current.actions.get(i));
                 }
+                return actions;
             }
 
             //otherwise expand children, etc

@@ -1,6 +1,8 @@
 package edu.cwru.sepia.agent.planner;
 
 import edu.cwru.sepia.action.Action;
+import edu.cwru.sepia.action.ActionFeedback;
+import edu.cwru.sepia.action.ActionResult;
 import edu.cwru.sepia.agent.Agent;
 import edu.cwru.sepia.agent.planner.actions.*;
 import edu.cwru.sepia.environment.model.history.History;
@@ -103,10 +105,20 @@ public class PEAgent extends Agent {
 
         //System.out.println(action.toString());
 
-        // wait for previous action to be done for this unit
-        if (actualUnit.getCurrentDurativeAction() != null) {
-            plan.push(action);
-            return retMap;
+//        // wait for previous action to be done for this unit
+//        if (actualUnit.getCurrentDurativeAction() != null) {
+//            plan.push(action);
+//            return retMap;
+//        }
+        if (stateView.getTurnNumber() != 0) {
+            Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
+            for (ActionResult result : actionResults.values()) {
+                if (result.getFeedback() == ActionFeedback.INCOMPLETE) {
+                    plan.push(action);
+                    return retMap;
+                }
+                System.out.println(result.toString());
+            }
         }
 
         if (action instanceof  MoveAction) {
@@ -115,12 +127,12 @@ public class PEAgent extends Agent {
         }
         if (action instanceof DepositAction) {
             DepositAction dAction = (DepositAction)action;
-            Direction dirToHall = dAction.townHall.location.getDirection(new Position(actualUnit.getXPosition(), actualUnit.getYPosition()));
+            Direction dirToHall = new Position(actualUnit.getXPosition(), actualUnit.getYPosition()).getDirection(dAction.townHall.location);
             retMap.put(actualID, Action.createPrimitiveDeposit(actualID, dirToHall));
         }
         if (action instanceof  HarvestAction) {
             HarvestAction hAction = (HarvestAction)action;
-            Direction dirToHall = hAction.resource.position.getDirection(new Position(actualUnit.getXPosition(), actualUnit.getYPosition()));
+            Direction dirToHall = new Position(actualUnit.getXPosition(), actualUnit.getYPosition()).getDirection(hAction.resource.position);
             retMap.put(actualID, Action.createPrimitiveGather(actualID, dirToHall));
         }
         return retMap;

@@ -43,6 +43,9 @@ public class GameState implements Comparable<GameState> {
     public int currentGold;
     public int currentWood;
 
+    public int food;
+    public int foodCap;
+
     public Map<Integer, UnitInfo> units;
     public Map<Integer, UnitInfo> townHalls;
 
@@ -71,6 +74,8 @@ public class GameState implements Comparable<GameState> {
         this.requiredWood = requiredWood;
         canBuildPeasants = buildPeasants;
         this.playernum = playernum;
+        food = state.getSupplyAmount(playernum);
+        foodCap = state.getSupplyCap(playernum);
 
         units = new HashMap<>();
         townHalls = new HashMap<>();
@@ -113,6 +118,8 @@ public class GameState implements Comparable<GameState> {
         playernum = oldState.playernum;
         currentGold = oldState.currentGold;
         currentWood = oldState.currentWood;
+        food = oldState.food;
+        foodCap = oldState.foodCap;
 
         units = new HashMap<>();
 

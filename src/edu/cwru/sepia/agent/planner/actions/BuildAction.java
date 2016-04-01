@@ -9,7 +9,12 @@ import edu.cwru.sepia.agent.planner.UnitInfo;
  */
 public class BuildAction implements StripsAction{
 
-    int newUnitID = 0;
+    public int newUnitID = 0;
+    public UnitInfo townHall = null;
+
+    public BuildAction(UnitInfo townHall) {
+        this.townHall = townHall;
+    }
 
     @Override
     public double getCost() {
@@ -18,12 +23,12 @@ public class BuildAction implements StripsAction{
 
     @Override
     public int getUnitID() {
-        return newUnitID;
+        return townHall.unitID;
     }
 
     @Override
     public boolean preconditionsMet(GameState state) {
-        return state.currentGold >= 400 && (state.foodCap - state.food) >= 1;
+        return state.currentGold >= 400 && (state.foodCap - state.food) >= 1 ;
     }
 
     @Override
@@ -38,6 +43,7 @@ public class BuildAction implements StripsAction{
         newPeasant.currentAction = UnitInfo.HeuristicAction.IDLE;
         newUnitID = newPeasant.unitID;
         newState.units.put(newUnitID, newPeasant);
+        newState.currentGold -= 400;
         newState.food += 1;
         return newState;
     }

@@ -14,9 +14,7 @@ import edu.cwru.sepia.util.Direction;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,6 +31,7 @@ public class PEAgent extends Agent {
     private Map<Integer, Integer> peasantIdMap;
     private int townhallId;
     private int peasantTemplateId;
+    private int latestNewUnit = 0;
 
     public PEAgent(int playernum, Stack<StripsAction> plan) {
         super(playernum);
@@ -97,6 +96,7 @@ public class PEAgent extends Agent {
     @Override
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
         // TODO: Implement me! (multiple actions/peasant build)
+        updateUnitMapping(stateView);
         StripsAction action = plan.pop();
         Map<Integer, Action> retMap = new HashMap<>();
 
@@ -128,7 +128,6 @@ public class PEAgent extends Agent {
             }
         }
 
-
         return retMap;
     }
 
@@ -136,12 +135,30 @@ public class PEAgent extends Agent {
         if (stateView.getTurnNumber() != 0) {
             Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
             for (ActionResult result : actionResults.values()) {
-                if (result.getFeedback() == ActionFeedback.INCOMPLETE) {
+                if (result.getAction().getUnitId() == unitID && result.getFeedback() == ActionFeedback.INCOMPLETE) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    private void updateUnitMapping(State.StateView state) {
+        List<Integer> realPeasantIDs = new ArrayList<Integer>();
+        for (Unit.UnitView unit: state.getAllUnits()) {
+            if (unit.getTemplateView().getName().equals("Peasant")) {
+                realPeasantIDs.add(unit.getID());
+            }
+        }
+        if (peasantIdMap.size() == realPeasantIDs.size()) {
+            return;
+        } else {
+            for (Integer id: realPeasantIDs) {
+                if (!peasantIdMap.containsValue(id)) {
+                    peasantIdMap.put(latestNewUnit, id);
+                }
+            }
+        }
     }
 
     /**
@@ -157,17 +174,20 @@ public class PEAgent extends Agent {
         if (action instanceof  MoveAction) {
             MoveAction mAction = (MoveAction)action;
             retMap.put(actualID, Action.createCompoundMove(actualID, mAction.targetPosition.x, mAction.targetPosition.y));
-        }
-        if (action instanceof DepositAction) {
+        } else if (action instanceof DepositAction) {
             DepositAction dAction = (DepositAction)action;
             Direction dirToHall = new Position(actualUnit.getXPosition(), actualUnit.getYPosition()).getDirection(dAction.townHall.location);
             retMap.put(actualID, Action.createPrimitiveDeposit(actualID, dirToHall));
-        }
-        if (action instanceof  HarvestAction) {
+        }else if (action instanceof  HarvestAction) {
             HarvestAction hAction = (HarvestAction)action;
             Direction dirToHall = new Position(actualUnit.getXPosition(), actualUnit.getYPosition()).getDirection(hAction.resource.position);
             retMap.put(actualID, Action.createPrimitiveGather(actualID, dirToHall));
+        } else if (action instanceof BuildAction) {
+            BuildAction bAction = (BuildAction)action;
+            retMap.put(actualID, Action.createPrimitiveBuild(actualID, peasantTemplateId));
+            latestNewUnit = bAction.newUnitID;
         }
+
     }
 
     @Override

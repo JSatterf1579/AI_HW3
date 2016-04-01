@@ -42,7 +42,7 @@ public class CombinationAction implements StripsAction {
     public GameState apply(GameState state) {
         GameState newState = new GameState(state);
         for (StripsAction action: actions) {
-            action.apply(newState);
+            newState = action.apply(newState);
         }
         newState.actions.add(this);
         return newState;

@@ -8,10 +8,7 @@ import edu.cwru.sepia.environment.model.state.Unit;
 import edu.cwru.sepia.environment.model.state.Unit.UnitView;
 
 import javax.print.DocFlavor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class is used to represent the state of the game after applying one of the avaiable actions. It will also
@@ -164,15 +161,12 @@ public class GameState implements Comparable<GameState> {
         }
     }
 
-    /**
-     * The branching factor of this search graph are much higher than the planning. Generate all of the possible
-     * successor states and their associated actions in this method.
-     *
-     * @return A list of the possible successor states and their associated actions
-     */
-    public List<GameState> generateChildren() {
 
-        List<GameState> children = new ArrayList<>();
+    public List<GameState> generateChildren() {
+        Queue<UnitInfo> unitsActive = new LinkedList<>();
+        for(UnitInfo unit : units.values()) {
+            unitsActive.add(unit);
+        }
 
         UnitInfo townHall = null;
 
@@ -180,66 +174,144 @@ public class GameState implements Comparable<GameState> {
             townHall = th;
         }
 
-        for(UnitInfo unit: units.values()) {
-            //Generate all move to gold pairs
-            for(ResourceInfo gold: mines.values()) {
-                StripsAction move = new MoveMine(unit, gold);
-                if(move.preconditionsMet(this)) {
-                    children.add(move.apply(this));
+
+        List<StripsAction> viableActions = generateChildrenRecursive(unitsActive);
+
+        List<GameState> applyList = new ArrayList<>();
+
+        for(StripsAction action : viableActions) {
+            applyList.add(action.apply(this));
+            if(canBuildPeasants) {
+                StripsAction procreate = mergeActions(action, new BuildAction(townHall));
+                if(procreate.preconditionsMet(this)) {
+                    applyList.add(procreate.apply(this));
                 }
-
-                //Generate all gold pickups
-                StripsAction harvest = new HarvestGold(unit, gold);
-                if(harvest.preconditionsMet(this)) {
-                    children.add(harvest.apply(this));
-                }
-
-            }
-
-            //Generate all move to wood pairs
-            for(ResourceInfo wood: trees.values()) {
-                StripsAction move = new MoveForest(unit, wood);
-                if(move.preconditionsMet(this)) {
-                    children.add(move.apply(this));
-                }
-
-                //Generate all wood pickups
-                StripsAction harvest = new HarvestWood(unit, wood);
-                if(harvest.preconditionsMet(this)) {
-                    children.add(harvest.apply(this));
-                }
-            }
-
-            //Generate all move to town hall pairs
-            for(UnitInfo hall: townHalls.values()) {
-                StripsAction move = new MoveTownHall(unit, hall);
-                if(move.preconditionsMet(this)) {
-                    children.add(move.apply(this));
-                }
-
-                //generate all gold dropoffs
-                StripsAction dropGold = new DepositGold(unit, hall);
-                if(dropGold.preconditionsMet(this)) {
-                    children.add(dropGold.apply(this));
-                }
-
-                //generate all wood dropoffs
-                StripsAction dropWood = new DepositWood(unit, hall);
-                if(dropWood.preconditionsMet(this)) {
-                    children.add(dropWood.apply(this));
-                }
-
             }
         }
+
         if(canBuildPeasants) {
-            StripsAction procreate = new BuildAction(townHall);
-            if(procreate.preconditionsMet(this)) {
-                children.add(procreate.apply(this));
+            StripsAction buildPeasant = new BuildAction(townHall);
+            if (buildPeasant.preconditionsMet(this)) {
+                applyList.add(buildPeasant.apply(this));
             }
         }
 
+        return applyList;
+    }
 
-        return children;
+    /**
+     * The branching factor of this search graph are much higher than the planning. Generate all of the possible
+     * successor states and their associated actions in this method.
+     *
+     * @return A list of the possible successor states and their associated actions
+     */
+    public List<StripsAction> generateChildrenRecursive(Queue<UnitInfo> units) {
+
+
+        if(units.size() < 1) {
+            return new ArrayList<>();
+        }
+
+        UnitInfo unit = units.poll();
+        List<StripsAction> children = new ArrayList<>();
+
+
+
+
+        //Generate all move to gold pairs
+        for(ResourceInfo gold: mines.values()) {
+            StripsAction move = new MoveMine(unit, gold);
+            if(move.preconditionsMet(this)) {
+                children.add(move);
+            }
+
+            //Generate all gold pickups
+            StripsAction harvest = new HarvestGold(unit, gold);
+            if(harvest.preconditionsMet(this)) {
+                children.add(harvest);
+            }
+
+        }
+
+        //Generate all move to wood pairs
+        for(ResourceInfo wood: trees.values()) {
+            StripsAction move = new MoveForest(unit, wood);
+            if(move.preconditionsMet(this)) {
+                children.add(move);
+            }
+
+            //Generate all wood pickups
+            StripsAction harvest = new HarvestWood(unit, wood);
+            if(harvest.preconditionsMet(this)) {
+                children.add(harvest);
+            }
+        }
+
+        //Generate all move to town hall pairs
+        for(UnitInfo hall: townHalls.values()) {
+            StripsAction move = new MoveTownHall(unit, hall);
+            if(move.preconditionsMet(this)) {
+                children.add(move);
+            }
+
+            //generate all gold dropoffs
+            StripsAction dropGold = new DepositGold(unit, hall);
+            if(dropGold.preconditionsMet(this)) {
+                children.add(dropGold);
+            }
+
+            //generate all wood dropoffs
+            StripsAction dropWood = new DepositWood(unit, hall);
+            if(dropWood.preconditionsMet(this)) {
+                children.add(dropWood);
+            }
+
+        }
+
+        if(units.size() <  1) {
+            return children;
+        } else {
+            List<StripsAction> returnList = new ArrayList<>();
+            for(StripsAction action : children) {
+                returnList.add(action);
+            }
+            List<StripsAction> fromBelow =  generateChildrenRecursive(units);
+            for(StripsAction action: children) {
+                for(StripsAction prevAction : fromBelow) {
+                    StripsAction newCombo = mergeActions(action, prevAction);
+                    if(newCombo.preconditionsMet(this)) {
+                        returnList.add(newCombo);
+                    }
+                }
+            }
+
+            return returnList;
+        }
+    }
+
+    private StripsAction mergeActions(StripsAction a1, StripsAction a2) {
+        List<StripsAction> actions = new ArrayList<>();
+        if(a1 instanceof CombinationAction ) {
+            CombinationAction c = (CombinationAction)a1;
+            for(StripsAction a : c.actions) {
+                actions.add(a);
+            }
+        } else {
+            actions.add(a1);
+        }
+
+        if(a2 instanceof CombinationAction ) {
+            CombinationAction c = (CombinationAction)a1;
+            for(StripsAction a : c.actions) {
+                actions.add(a);
+            }
+        } else {
+            actions.add(a1);
+        }
+
+        CombinationAction action = new CombinationAction(actions);
+        return action;
+
     }
 
     /**

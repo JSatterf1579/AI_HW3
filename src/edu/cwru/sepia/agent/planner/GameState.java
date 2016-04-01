@@ -76,6 +76,7 @@ public class GameState implements Comparable<GameState> {
         this.playernum = playernum;
         food = state.getSupplyAmount(playernum);
         foodCap = state.getSupplyCap(playernum);
+        System.out.println("" + requiredGold + requiredWood);
 
         units = new HashMap<>();
         townHalls = new HashMap<>();
@@ -173,6 +174,12 @@ public class GameState implements Comparable<GameState> {
 
         List<GameState> children = new ArrayList<>();
 
+        UnitInfo townHall = null;
+
+        for(UnitInfo th: townHalls.values()) {
+            townHall = th;
+        }
+
         for(UnitInfo unit: units.values()) {
             //Generate all move to gold pairs
             for(ResourceInfo gold: mines.values()) {
@@ -225,6 +232,13 @@ public class GameState implements Comparable<GameState> {
             }
         }
 
+        if(canBuildPeasants) {
+            StripsAction procreate = new BuildAction(townHall);
+            if(procreate.preconditionsMet(this)) {
+                children.add(procreate.apply(this));
+            }
+        }
+
 
         return children;
     }
@@ -248,35 +262,31 @@ public class GameState implements Comparable<GameState> {
         }
 
 
-        int resourcesNeededPerUnit = ((requiredGold - currentGold) + (requiredWood - currentWood)) / units.size();
+        int resourcesNeededPerUnit = (Math.max(requiredGold - currentGold, 0) + Math.max(requiredWood - currentWood, 0)) / units.size();
 
 
        for(UnitInfo unit: units.values()) {
             if(unit.cargo == null) {
-                boolean alreadyRewarded = false;
                 if(currentGold < requiredGold) {
                     for(ResourceInfo mine: mines.values()) {
                         if(unit.location.equals(mine.position)) {
                             heuristic += 25/units.size();
-                            alreadyRewarded = true;
-                            break;
                         }
                     }
                 }
 
-                if(currentWood < requiredWood && !alreadyRewarded) {
+                if(currentWood < requiredWood) {
                     for(ResourceInfo wood: trees.values()) {
                         if(unit.location.equals(wood.position)) {
                             heuristic += 25/units.size();
-                            break;
                         }
                     }
                 }
             } else {
                 if(unit.location.equals(townHall.location)) {
-                    heuristic += 75/units.size();
+                    heuristic += 75;
                 } else {
-                    heuristic += 50/units.size();
+                    heuristic += 50;
                 }
             }
        }

@@ -306,7 +306,7 @@ public class GameState implements Comparable<GameState> {
                 actions.add(a);
             }
         } else {
-            actions.add(a1);
+            actions.add(a2);
         }
 
         CombinationAction action = new CombinationAction(actions);

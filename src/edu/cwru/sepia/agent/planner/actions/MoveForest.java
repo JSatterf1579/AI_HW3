@@ -13,7 +13,7 @@ public class MoveForest extends MoveAction{
 
     public ResourceInfo resource = null;
 
-    public MoveForest(UnitInfo peasant, ResourceInfo resource) {
+    public MoveForest(UnitInfo peasant, ResourceInfo resource ) {
         this.peasant = peasant;
         this.resource = resource;
         this.targetPosition = resource.position;
@@ -30,7 +30,7 @@ public class MoveForest extends MoveAction{
 
     @Override
     public boolean preconditionsMet(GameState state) {
-        if (peasant.type == UnitInfo.UnitType.PEASANT && resource.type == ResourceNode.Type.TREE) {
+        if (peasant.type == UnitInfo.UnitType.PEASANT && resource.type == ResourceNode.Type.TREE && resource.capacity > 0) {
             Position pos = this.getClosestAdjacentToTarget(state);
             return null != pos;
         }

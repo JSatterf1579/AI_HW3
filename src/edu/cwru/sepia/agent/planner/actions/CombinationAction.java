@@ -31,11 +31,14 @@ public class CombinationAction implements StripsAction {
 
     @Override
     public boolean preconditionsMet(GameState state) {
-        boolean subConditionsMet = true;
         for (StripsAction action: actions) {
-            subConditionsMet = subConditionsMet && action.preconditionsMet(state);
+            if(action.preconditionsMet(state)) {
+                state = action.apply(state);
+            } else {
+                return false;
+            }
         }
-        return subConditionsMet;
+        return true;
     }
 
     @Override
@@ -43,8 +46,18 @@ public class CombinationAction implements StripsAction {
         GameState newState = new GameState(state);
         for (StripsAction action: actions) {
             newState = action.apply(newState);
+            newState.actions.remove(newState.actions.size()-1);
         }
         newState.actions.add(this);
         return newState;
+    }
+
+    public String toString() {
+        String s = "----------{\n";
+        for(StripsAction action : actions) {
+            s = s + action.toString() + "\n";
+        }
+        s = s + "-----------}";
+        return s;
     }
 }

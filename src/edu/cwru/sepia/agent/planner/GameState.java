@@ -301,7 +301,7 @@ public class GameState implements Comparable<GameState> {
         }
 
         if(a2 instanceof CombinationAction ) {
-            CombinationAction c = (CombinationAction)a1;
+            CombinationAction c = (CombinationAction)a2;
             for(StripsAction a : c.actions) {
                 actions.add(a);
             }

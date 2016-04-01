@@ -17,9 +17,11 @@ public class CombinationAction implements StripsAction {
 
     @Override
     public double getCost() {
-        double cost = 0;
+        double cost = Double.MIN_VALUE;
         for (StripsAction action: actions) {
-            cost += action.getCost();
+            if (action.getCost() > cost) {
+                cost = action.getCost();
+            }
         }
         return cost;
     }

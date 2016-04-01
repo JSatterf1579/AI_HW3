@@ -44,6 +44,7 @@ public class CombinationAction implements StripsAction {
         for (StripsAction action: actions) {
             action.apply(newState);
         }
+        newState.actions.add(this);
         return newState;
     }
 }

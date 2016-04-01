@@ -231,7 +231,6 @@ public class GameState implements Comparable<GameState> {
 
             }
         }
-
         if(canBuildPeasants) {
             StripsAction procreate = new BuildAction(townHall);
             if(procreate.preconditionsMet(this)) {
@@ -265,7 +264,7 @@ public class GameState implements Comparable<GameState> {
         int resourcesNeededPerUnit = (Math.max(requiredGold - currentGold, 0) + Math.max(requiredWood - currentWood, 0)) / units.size();
 
 
-       for(UnitInfo unit: units.values()) {
+        for(UnitInfo unit: units.values()) {
             if(unit.cargo == null) {
                 if(currentGold < requiredGold) {
                     for(ResourceInfo mine: mines.values()) {
@@ -289,7 +288,7 @@ public class GameState implements Comparable<GameState> {
                     heuristic += 50;
                 }
             }
-       }
+        }
 
         return heuristic - resourcesNeededPerUnit;
     }

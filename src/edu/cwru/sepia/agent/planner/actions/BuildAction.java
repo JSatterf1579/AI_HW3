@@ -34,9 +34,8 @@ public class BuildAction implements StripsAction{
     @Override
     public GameState apply(GameState state) {
         GameState newState = new GameState(state);
-        UnitInfo newPeasant = new UnitInfo(getAUnit(state));
-        UnitInfo townHall = getATownHall(state);
-        newPeasant.unitID = getNewID(state);
+        UnitInfo newPeasant = new UnitInfo(getAUnit(newState));
+        newPeasant.unitID = getNewID(newState);
         newPeasant.location = new Position(townHall.location);
         newPeasant.cargo = null;
         newPeasant.amount = 0;
@@ -45,6 +44,7 @@ public class BuildAction implements StripsAction{
         newState.units.put(newUnitID, newPeasant);
         newState.currentGold -= 400;
         newState.food += 1;
+        newState.actions.add(this);
         return newState;
     }
 
@@ -54,8 +54,8 @@ public class BuildAction implements StripsAction{
     }
 
     private int getNewID(GameState state) {
-        int i = 0;
-        while (!state.units.keySet().contains(i)) {
+        int i = 1;
+        while (state.units.keySet().contains(i)) {
             i++;
         }
         return i;
@@ -65,4 +65,16 @@ public class BuildAction implements StripsAction{
         int someID = state.townHalls.keySet().iterator().next();
         return state.townHalls.get(someID);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("BuildAction(");
+        sb.append(townHall.unitID);
+        sb.append(", ");
+        sb.append(newUnitID);
+        sb.append(")");
+        return sb.toString();
+    }
+
 }

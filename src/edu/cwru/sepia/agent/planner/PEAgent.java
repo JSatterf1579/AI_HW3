@@ -37,6 +37,7 @@ public class PEAgent extends Agent {
         super(playernum);
         peasantIdMap = new HashMap<Integer, Integer>();
         this.plan = plan;
+//        System.out.println(plan);
 
     }
 
@@ -133,14 +134,25 @@ public class PEAgent extends Agent {
 
     public boolean isUnitBusy(int unitID, State.StateView stateView, History.HistoryView historyView) {
         if (stateView.getTurnNumber() != 0) {
+            if (!isAPeasant(unitID)) {
+                return false;
+            }
             Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
             for (ActionResult result : actionResults.values()) {
-                if (result.getAction().getUnitId() == unitID && result.getFeedback() == ActionFeedback.INCOMPLETE) {
+//                System.out.println(result.getFeedback());
+//                System.out.println(result.getAction());
+                if (result.getAction().getUnitId() == peasantIdMap.get(unitID) && result.getFeedback() == ActionFeedback.INCOMPLETE || result.getFeedback() == ActionFeedback.FAILED) {
                     return true;
+                } else if (result.getAction().getUnitId() == peasantIdMap.get(unitID) && result.getFeedback() != ActionFeedback.COMPLETED) {
+//                    System.out.println("non - Incomplete/failed action");
                 }
             }
         }
         return false;
+    }
+
+    public boolean isAPeasant(int ID) {
+        return peasantIdMap.keySet().contains(ID);
     }
 
     private void updateUnitMapping(State.StateView state) {
@@ -150,6 +162,8 @@ public class PEAgent extends Agent {
                 realPeasantIDs.add(unit.getID());
             }
         }
+//        System.out.println(peasantIdMap.size());
+//        System.out.println(realPeasantIDs.size());
         if (peasantIdMap.size() == realPeasantIDs.size()) {
             return;
         } else {
@@ -168,8 +182,16 @@ public class PEAgent extends Agent {
      */
     private void addSepiaAction(StripsAction action, State.StateView stateView, Map<Integer, Action> retMap) {
         int stripsID = action.getUnitID();
-        int actualID = peasantIdMap.get(stripsID);
-        Unit.UnitView actualUnit = stateView.getUnit(actualID);
+        Unit.UnitView actualUnit = null;
+        int actualID = 0;
+        try {
+            actualID = peasantIdMap.get(stripsID);
+            actualUnit = stateView.getUnit(actualID);
+        } catch (NullPointerException e){
+//            System.out.println("Null Pointer for ActualID");
+//            System.out.println(action);
+//            System.out.println(peasantIdMap);
+        }
 
         if (action instanceof  MoveAction) {
             MoveAction mAction = (MoveAction)action;
@@ -183,10 +205,12 @@ public class PEAgent extends Agent {
             Direction dirToHall = new Position(actualUnit.getXPosition(), actualUnit.getYPosition()).getDirection(hAction.resource.position);
             retMap.put(actualID, Action.createPrimitiveGather(actualID, dirToHall));
         } else if (action instanceof BuildAction) {
+            actualID = action.getUnitID();
             BuildAction bAction = (BuildAction)action;
             retMap.put(actualID, Action.createPrimitiveBuild(actualID, peasantTemplateId));
             latestNewUnit = bAction.newUnitID;
         }
+//        System.out.println(action);
 
     }
 

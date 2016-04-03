@@ -9,9 +9,9 @@ import edu.cwru.sepia.agent.planner.GameState;
  */
 public interface StripsAction {
 
-    public double getCost();
-    public int getUnitID();
-    public String toString();  //TODO implement for all leaf classes
+    public double getCost(); //The distance/time cost for this action
+    public int getUnitID(); //A function useful for turning the function into a Sepia Action, just returns the ID of the Unit doing the action
+    public String toString();  //We need toString for debugging and printing the plan to a file
 
     /**
      * Returns true if the provided GameState meets all of the necessary conditions for this action to successfully

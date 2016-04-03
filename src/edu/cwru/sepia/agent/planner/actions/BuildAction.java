@@ -9,8 +9,8 @@ import edu.cwru.sepia.agent.planner.UnitInfo;
  */
 public class BuildAction implements StripsAction{
 
-    public int newUnitID = 0;
-    public UnitInfo townHall = null;
+    public int newUnitID = 0; // the ID of the unit being created
+    public UnitInfo townHall = null; // the townhall doing the creation
 
     public BuildAction(UnitInfo townHall) {
         this.townHall = townHall;
@@ -48,22 +48,27 @@ public class BuildAction implements StripsAction{
         return newState;
     }
 
+    /**
+     * Retrieves a random peasant unit to serve as a base template
+     * @param state the previous state to grab a unit from
+     * @return
+     */
     private UnitInfo getAUnit(GameState state) {
         int someID = state.units.keySet().iterator().next();
         return state.units.get(someID);
     }
 
+    /**
+     * Finds the first positive integer not taken as a Unit ID
+     * @param state the state whose units we will compare with
+     * @return
+     */
     private int getNewID(GameState state) {
         int i = 1;
         while (state.units.keySet().contains(i)) {
             i++;
         }
         return i;
-    }
-
-    private UnitInfo getATownHall(GameState state) {
-        int someID = state.townHalls.keySet().iterator().next();
-        return state.townHalls.get(someID);
     }
 
     @Override

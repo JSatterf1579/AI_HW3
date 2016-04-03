@@ -11,13 +11,13 @@ import edu.cwru.sepia.environment.model.state.ResourceNode;
  */
 public class MoveForest extends MoveAction{
 
-    public ResourceInfo resource = null;
+    public ResourceInfo resource = null; // the resource(mine) we're moving to
 
     public MoveForest(UnitInfo peasant, ResourceInfo resource ) {
         this.peasant = peasant;
         this.resource = resource;
         this.targetPosition = resource.position;
-        this.cost = peasant.location.chebyshevDistance(resource.position);
+        this.cost = peasant.location.chebyshevDistance(resource.position); // use the chebyshev distance to approximate distance
     }
 
     @Override

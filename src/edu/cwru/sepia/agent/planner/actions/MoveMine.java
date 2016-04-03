@@ -11,7 +11,7 @@ import edu.cwru.sepia.environment.model.state.ResourceNode;
  */
 public class MoveMine extends MoveAction {
 
-    public ResourceInfo resource = null;
+    public ResourceInfo resource = null; // the resource/forest that we're moving to
 
     public MoveMine(UnitInfo peasant, ResourceInfo resource) {
         this.peasant = peasant;

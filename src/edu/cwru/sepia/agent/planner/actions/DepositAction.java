@@ -7,10 +7,9 @@ import edu.cwru.sepia.agent.planner.UnitInfo;
  */
 public abstract class DepositAction implements StripsAction {
 
-
-    public UnitInfo peasant = null;
-    public UnitInfo townHall = null;
-    public double cost = 1;
+    public UnitInfo peasant = null; // the peasant depositing a resource
+    public UnitInfo townHall = null; // the townhall we are depositing resources at
+    public double cost = 1; // the cost of depositing is always 1
 
     @Override
     public double getCost() {

@@ -9,7 +9,7 @@ import edu.cwru.sepia.agent.planner.UnitInfo;
  */
 public class MoveTownHall extends MoveAction {
 
-    public UnitInfo townHall = null;
+    public UnitInfo townHall = null; // the town hall that we want to move to
 
     public MoveTownHall(UnitInfo peasant, UnitInfo townHall) {
         this.peasant = peasant;

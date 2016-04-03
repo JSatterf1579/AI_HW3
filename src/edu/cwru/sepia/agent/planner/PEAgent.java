@@ -96,30 +96,25 @@ public class PEAgent extends Agent {
      */
     @Override
     public Map<Integer, Action> middleStep(State.StateView stateView, History.HistoryView historyView) {
-        // TODO: Implement me! (multiple actions/peasant build)
+        // make sure the units in the stateview are the same number as units in the ID map.
         updateUnitMapping(stateView);
+
+        // look at the top action
         StripsAction action = plan.pop();
+
+        // initialize a map for return
         Map<Integer, Action> retMap = new HashMap<>();
 
-        //System.out.println(action.toString());
-
-//        // wait for previous action to be done for this unit
-//        if (actualUnit.getCurrentDurativeAction() != null) {
-//            plan.push(action);
-//            return retMap;
-//        }
-
-
-        if (action instanceof CombinationAction) {
+        if (action instanceof CombinationAction) { // iterate over all actions in a combination action
             CombinationAction cAction = (CombinationAction)action;
             for (StripsAction subAction: cAction.actions) {
-                if (!isUnitBusy(subAction.getUnitID(), stateView, historyView)) {
+                if (!isUnitBusy(subAction.getUnitID(), stateView, historyView)) { // if the unit doing the action is free, add it ot the map
                     addSepiaAction(subAction, stateView, retMap);
-                } else {
+                } else { // actions that cannot be done should go on top of the stack to be done next
                     plan.push(subAction);
                 }
             }
-        } else {
+        } else { //  same process for individual actions
             if (!isUnitBusy(action.getUnitID(), stateView, historyView)) {
                 addSepiaAction(action, stateView, retMap);
             } else {
@@ -130,15 +125,23 @@ public class PEAgent extends Agent {
         return retMap;
     }
 
+    /**
+     * Checks if a unit is done with their last action.
+     * @param unitID the unit who we want to check on
+     * @param stateView the game state
+     * @param historyView the previous actions for this episode
+     * @return
+     */
     public boolean isUnitBusy(int unitID, State.StateView stateView, History.HistoryView historyView) {
-        if (stateView.getTurnNumber() != 0) {
-            if (!isAPeasant(unitID)) {
+        if (stateView.getTurnNumber() != 0) { // we don't car about turn 1
+            if (!isAPeasant(unitID)) { // non-peasants don't need more than one turn for anything
                 return false;
             }
             Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
             for (ActionResult result : actionResults.values()) {
-                System.out.println(result.getFeedback());
-                System.out.println(result.getAction());
+//                System.out.println(result.getFeedback());
+//                System.out.println(result.getAction());
+                // only check the last action for THIS unit, being busy when an action is incomplete for failed()
                 if (result.getAction().getUnitId() == peasantIdMap.get(unitID) && result.getFeedback() == ActionFeedback.INCOMPLETE || result.getFeedback() == ActionFeedback.FAILED) {
                     return true;
                 } else if (result.getAction().getUnitId() == peasantIdMap.get(unitID) && result.getFeedback() != ActionFeedback.COMPLETED) {
@@ -149,11 +152,21 @@ public class PEAgent extends Agent {
         return false;
     }
 
+    /**
+     * Check if a unit is a peasant
+     * @param ID The ID of the unit in question
+     * @return
+     */
     public boolean isAPeasant(int ID) {
         return peasantIdMap.keySet().contains(ID);
     }
 
+    /**
+     * Updates the mapping of unit IDs to include the new unit generated in a build action
+     * @param state
+     */
     private void updateUnitMapping(State.StateView state) {
+        // create list of all peasants
         List<Integer> realPeasantIDs = new ArrayList<Integer>();
         for (Unit.UnitView unit: state.getAllUnits()) {
             if (unit.getTemplateView().getName().equals("Peasant")) {
@@ -162,9 +175,9 @@ public class PEAgent extends Agent {
         }
 //        System.out.println(peasantIdMap.size());
 //        System.out.println(realPeasantIDs.size());
-        if (peasantIdMap.size() == realPeasantIDs.size()) {
+        if (peasantIdMap.size() == realPeasantIDs.size()) { // stop if the list is the size of the map
             return;
-        } else {
+        } else { // find the new unit and map the Strips ID to the Sepia ID
             for (Integer id: realPeasantIDs) {
                 if (!peasantIdMap.containsValue(id)) {
                     peasantIdMap.put(latestNewUnit, id);
@@ -176,21 +189,26 @@ public class PEAgent extends Agent {
     /**
      * Returns a SEPIA version of the specified Strips Action.
      * @param action StripsAction
+     * @param stateView the state we want to perform an action on
+     * @param retMap the map of Unit ID to Action that we are adding to.
      * @return SEPIA representation of same action
      */
     private void addSepiaAction(StripsAction action, State.StateView stateView, Map<Integer, Action> retMap) {
+        // get information about the unit doing the action
         int stripsID = action.getUnitID();
         Unit.UnitView actualUnit = null;
         int actualID = 0;
-        try {
+
+        try { // try to get the Sepia ID and UnitView for the Strips unit ID
             actualID = peasantIdMap.get(stripsID);
             actualUnit = stateView.getUnit(actualID);
-        } catch (NullPointerException e){
+        } catch (NullPointerException e){ // if this fails, a townhall is doing the job, and these variables don't matter
 //            System.out.println("Null Pointer for ActualID");
 //            System.out.println(action);
 //            System.out.println(peasantIdMap);
         }
 
+        // create the corresponding Sepia Action for the type of StripsAction
         if (action instanceof  MoveAction) {
             MoveAction mAction = (MoveAction)action;
             retMap.put(actualID, Action.createCompoundMove(actualID, mAction.targetPosition.x, mAction.targetPosition.y));

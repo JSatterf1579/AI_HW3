@@ -6,10 +6,11 @@ import java.util.List;
 
 /**
  * Created by Steven on 3/31/2016.
+ * A StripsAction composed of more than one action.
  */
 public class CombinationAction implements StripsAction {
 
-    public List<StripsAction> actions;
+    public List<StripsAction> actions; // the subactions that make up this multi-action move
 
     public CombinationAction(List<StripsAction> actions) {
         this.actions = actions;
@@ -32,7 +33,7 @@ public class CombinationAction implements StripsAction {
     }
 
     @Override
-    public boolean preconditionsMet(GameState state) {
+    public boolean preconditionsMet(GameState state) { // makes sure all states will have their preconditions met if performed sequentially
         for (StripsAction action: actions) {
             if(action.preconditionsMet(state)) {
                 state = action.apply(state);
@@ -44,7 +45,7 @@ public class CombinationAction implements StripsAction {
     }
 
     @Override
-    public GameState apply(GameState state) {
+    public GameState apply(GameState state) { // applies all actions to the state, one after another
         GameState newState = new GameState(state);
         for (StripsAction action: actions) {
             newState = action.apply(newState);

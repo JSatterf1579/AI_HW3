@@ -181,12 +181,12 @@ public class GameState implements Comparable<GameState> {
 
         for(StripsAction action : viableActions) {
             applyList.add(action.apply(this));
-            if(canBuildPeasants) {
-                StripsAction procreate = mergeActions(action, new BuildAction(townHall));
-                if(procreate.preconditionsMet(this)) {
-                    applyList.add(procreate.apply(this));
-                }
-            }
+//            if(canBuildPeasants) {
+//                StripsAction procreate = mergeActions(action, new BuildAction(townHall));
+//                if(procreate.preconditionsMet(this)) {
+//                    applyList.add(procreate.apply(this));
+//                }
+//            }
         }
 
         if(canBuildPeasants) {

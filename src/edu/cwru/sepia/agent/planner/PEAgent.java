@@ -117,7 +117,6 @@ public class PEAgent extends Agent {
                     addSepiaAction(subAction, stateView, retMap);
                 } else {
                     plan.push(subAction);
-                    return retMap;
                 }
             }
         } else {
@@ -125,7 +124,6 @@ public class PEAgent extends Agent {
                 addSepiaAction(action, stateView, retMap);
             } else {
                 plan.push(action);
-                return retMap;
             }
         }
 
@@ -139,8 +137,8 @@ public class PEAgent extends Agent {
             }
             Map<Integer, ActionResult> actionResults = historyView.getCommandFeedback(playernum, stateView.getTurnNumber() - 1);
             for (ActionResult result : actionResults.values()) {
-//                System.out.println(result.getFeedback());
-//                System.out.println(result.getAction());
+                System.out.println(result.getFeedback());
+                System.out.println(result.getAction());
                 if (result.getAction().getUnitId() == peasantIdMap.get(unitID) && result.getFeedback() == ActionFeedback.INCOMPLETE || result.getFeedback() == ActionFeedback.FAILED) {
                     return true;
                 } else if (result.getAction().getUnitId() == peasantIdMap.get(unitID) && result.getFeedback() != ActionFeedback.COMPLETED) {
